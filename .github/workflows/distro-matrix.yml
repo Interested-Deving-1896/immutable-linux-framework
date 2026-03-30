@@ -151,7 +151,7 @@ jobs:
         run: ${{ matrix.ca_install }}
 
       - name: Build ilf
-        run: go build -o /usr/local/bin/ilf ./tools/ilf
+        run: go build -buildvcs=false -o /usr/local/bin/ilf ./tools/ilf
 
       - name: Write ilf.toml
         run: |
