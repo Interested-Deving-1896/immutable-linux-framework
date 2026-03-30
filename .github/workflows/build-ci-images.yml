@@ -20,6 +20,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set lowercase owner
+        run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -33,8 +36,8 @@ jobs:
           context: .github/images/opensuse-tumbleweed-ci
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/opensuse-tumbleweed-ci:latest
-            ghcr.io/${{ github.repository_owner }}/opensuse-tumbleweed-ci:${{ github.sha }}
+            ghcr.io/${{ env.OWNER }}/opensuse-tumbleweed-ci:latest
+            ghcr.io/${{ env.OWNER }}/opensuse-tumbleweed-ci:${{ github.sha }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.description=openSUSE Tumbleweed with tar+git+sh for GitHub Actions
