@@ -82,18 +82,17 @@ jobs:
             pkg_install: "apk add --no-cache"
             ca_install: "apk add --no-cache ca-certificates"
 
-          # ── openSUSE / SLES-compatible ─────────────────────────────────────
-          # opensuse/leap and opensuse/tumbleweed both lack tar/git pre-installed
-          # which breaks actions/checkout before we can run any install step.
-          # rockylinux:9 is RHEL-compatible, ships /bin/sh, tar, and git,
-          # and validates the zypper-family (dnf) code path adequately.
-          # A dedicated openSUSE job can be added once a pre-bootstrapped image
-          # (with tar+git) is available in a registry.
+          # ── openSUSE Tumbleweed ────────────────────────────────────────────
+          # Uses a pre-bootstrapped GHCR image built by build-ci-images.yml.
+          # That image layers tar, git, gzip, ca-certificates, and a
+          # /bin/sh -> /bin/bash symlink onto opensuse/tumbleweed:latest so
+          # the Actions runner can launch steps normally.
+          # The image is rebuilt automatically when .github/images/** changes.
           - distro: opensuse
-            image: rockylinux:9
+            image: ghcr.io/interested-deving-1896/opensuse-tumbleweed-ci:latest
             backend: ashos
-            pkg_install: "dnf install -y"
-            ca_install: "dnf install -y ca-certificates"
+            pkg_install: "zypper install -y"
+            ca_install: "true"
 
     container:
       image: ${{ matrix.image }}
