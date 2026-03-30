@@ -65,9 +65,9 @@ func setupLUKS(rawDev, password string) (*LUKSResult, error) {
 	}, nil
 }
 
-// closeLUKS closes the dm-crypt device opened by setupLUKS.
+// CloseLUKS closes the dm-crypt device opened by setupLUKS.
 // Call this after the filesystem has been unmounted.
-func closeLUKS() error {
+func CloseLUKS() error {
 	if _, err := os.Stat(luksMapperPath); os.IsNotExist(err) {
 		return nil // already closed
 	}

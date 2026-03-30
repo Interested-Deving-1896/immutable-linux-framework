@@ -9,9 +9,45 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Build the openSUSE CI image and push it to GHCR so the smoke-test matrix
+  # job can pull it. Running this as a prerequisite job avoids the
+  # chicken-and-egg problem where the image must exist before the workflow
+  # that creates it has ever run on main.
+  build-opensuse-image:
+    name: Build openSUSE CI image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: meta
+        uses: docker/build-push-action@v5
+        with:
+          context: .github/images/opensuse-tumbleweed-ci
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/opensuse-tumbleweed-ci:latest
+            ghcr.io/${{ github.repository_owner }}/opensuse-tumbleweed-ci:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.description=openSUSE Tumbleweed with tar+git+sh for GitHub Actions
+
   smoke-test:
     name: "${{ matrix.distro }} / ${{ matrix.backend }}"
     runs-on: ubuntu-latest
+    needs: [build-opensuse-image]
 
     strategy:
       fail-fast: false

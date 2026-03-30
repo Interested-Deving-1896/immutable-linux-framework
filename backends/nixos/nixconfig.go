@@ -48,9 +48,6 @@ var (
 	// reListOpen matches the opening of environment.systemPackages.
 	reListOpen = regexp.MustCompile(`^\s*environment\.systemPackages\s*=`)
 
-	// reListClose matches the closing ]; of a Nix list.
-	reListClose = regexp.MustCompile(`^\s*\];`)
-
 	// rePkgEntry matches a package entry line (with or without pkgs. prefix).
 	rePkgEntry = regexp.MustCompile(`^\s*(pkgs\.)?(\S+)\s*$`)
 )
