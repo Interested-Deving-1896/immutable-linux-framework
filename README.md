@@ -1,191 +1,75 @@
-# Immutable Linux Framework (ILF)
+[update-readmes]   Mode: rewrite — migrating to template structure...
+# immutable-linux-framework
 
-A distro-agnostic, architecture-agnostic framework for building immutable Linux distributions. Distro builders choose one or more immutability backends at build time; the framework provides a unified HAL (Hardware Abstraction Layer) and CLI surface on top.
+[![Built with Ona](https://ona.com/build-with-ona.svg)](https://app.ona.com/#https://github.com/Interested-Deving-1896/immutable-linux-framework)
 
----
-
-## Integrated Backends
-
-| Backend | Origin Project | Mechanism | Best For |
-|---|---|---|---|
-| `abroot` | [Vanilla-OS/ABRoot](https://github.com/Vanilla-OS/ABRoot) | A/B partition swap + OCI images | Appliance/desktop, atomic OCI-based updates |
-| `ashos` | [ashos/ashos](https://github.com/ashos/ashos) | BTRFS snapshot tree | Multi-distro, hierarchical snapshot management |
-| `frzr` | [ChimeraOS/frzr](https://github.com/ChimeraOS/frzr) | Read-only BTRFS subvolume deploy | Gaming/appliance, image-based deployment |
-| `akshara` | [blend-os/akshara](https://github.com/blend-os/akshara) | YAML-declared system rebuild | Declarative, container-native distros |
-| `btrfs-dwarfs` | [btrfs-dwarfs-framework](https://gitlab.com/openos-project/linux-kernel_filesystem_deving/btrfs-dwarfs-framework) | BTRFS+DwarFS hybrid blend layer | Storage-constrained, high-compression roots |
-
-> **nearly** (blend-os/nearly) is absorbed into the `mutable` core module as the toggle-immutability primitive.
-
----
+<!-- AI:start:what-it-does -->
+_Description pending._
+<!-- AI:end:what-it-does -->
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    ilf  (unified CLI)                           │
-│   ilf init │ ilf upgrade │ ilf rollback │ ilf status │ ilf pkg  │
-└────────────────────────┬────────────────────────────────────────┘
-                         │  Backend-Agnostic API
-┌────────────────────────▼────────────────────────────────────────┐
-│                  Core HAL  (core/)                              │
-│  config │ bootloader │ snapshot │ update │ mutable │ distro-db  │
-└──┬──────┬──────┬──────┬──────┬──────────────────────────────────┘
-   │      │      │      │      │
-   ▼      ▼      ▼      ▼      ▼
-abroot  ashos  frzr  akshara  btrfs-dwarfs
-(Go)   (Py)  (Shell) (Py)    (C+Shell)
-```
+<!-- AI:start:architecture -->
+_Architecture documentation pending._
+<!-- AI:end:architecture -->
 
-### Core Modules
+## Install
 
-| Module | Responsibility |
-|---|---|
-| `core/hal` | Backend registration, capability detection, dispatch |
-| `core/config` | Unified `ilf.toml` parser; per-backend config shims |
-| `core/bootloader` | GRUB/systemd-boot abstraction (wraps each backend's boot logic) |
-| `core/snapshot` | Common snapshot lifecycle: create, list, deploy, delete, rollback |
-| `core/update` | Atomic update orchestration; pre/post hooks |
-| `core/mutable` | Immutability toggle (absorbs `nearly`'s chattr/overlayfs logic) |
-
----
-
-## Supported Distro Matrix
-
-Defined in `distros/`. Each file declares which backends are compatible and any distro-specific shims needed.
-
-| Distro Family | Package Manager | Supported Backends |
-|---|---|---|
-| Arch / CachyOS / EndeavourOS | pacman | ashos, frzr, akshara, btrfs-dwarfs |
-| Debian / Ubuntu / Mint | apt | abroot, ashos, akshara |
-| Fedora / RHEL / CentOS | dnf/rpm | ashos, akshara |
-| Alpine | apk | ashos, akshara |
-| Gentoo | portage | ashos |
-| openSUSE | zypper | ashos, akshara |
-| Void Linux | xbps | ashos, frzr |
-| NixOS | nix | (native immutability; ilf wraps as passthrough) |
-| ChimeraOS | pacman | frzr (native), ashos |
-| Vanilla OS | apt | abroot (native), ashos |
-| blendOS | pacman | akshara (native), ashos |
-
----
-
-## Quick Start
+<!-- Add installation instructions here. This section is yours — the AI will not modify it. -->
 
 ```bash
-# Install ILF
-curl -fsSL https://ilf.example.org/install.sh | sh
-
-# Initialize a new distro build with the abroot backend
-ilf init --distro ubuntu --backend abroot --arch x86_64
-
-# Or with the ashos backend on Arch
-ilf init --distro arch --backend ashos --arch aarch64
-
-# Upgrade the system (backend-transparent)
-ilf upgrade
-
-# Roll back to the previous state
-ilf rollback
-
-# Toggle mutability for a one-off change
-ilf mutable enter
-# ... make changes ...
-ilf mutable exit
+git clone https://github.com/Interested-Deving-1896/immutable-linux-framework.git
+cd immutable-linux-framework
 ```
 
----
+## Usage
 
-## Repository Layout
+<!-- Add usage examples here. This section is yours — the AI will not modify it. -->
 
-```
-immutable-linux-framework/
-├── core/
-│   ├── hal/            # Backend HAL: registration, capability flags, dispatch
-│   ├── config/         # ilf.toml schema + per-backend config adapters
-│   ├── bootloader/     # GRUB / systemd-boot abstraction
-│   ├── snapshot/       # Snapshot lifecycle primitives
-│   ├── update/         # Atomic update orchestration
-│   └── mutable/        # Immutability toggle (nearly-derived)
-│
-├── backends/
-│   ├── abroot/         # ABRoot v2 adapter (Go shim + config bridge)
-│   ├── ashos/          # AshOS adapter (Python shim + distro profiles)
-│   ├── frzr/           # frzr adapter (Shell shim + image deploy)
-│   ├── akshara/        # akshara adapter (Python shim + system.yaml bridge)
-│   └── btrfs-dwarfs/   # BTRFS+DwarFS adapter (C kernel module + daemon shim)
-│
-├── distros/            # Per-distro capability declarations (TOML)
-│
-├── docs/
-│   ├── architecture.md
-│   ├── backends.md
-│   ├── distro-matrix.md
-│   ├── adding-a-backend.md
-│   └── adding-a-distro.md
-│
-├── tests/
-│   ├── integration/
-│   └── unit/
-│
-├── tools/              # ilf CLI source
-├── scripts/            # Bootstrap and install helpers
-├── systemd/            # ilf-update.service / ilf-update.timer
-│
-├── ilf.toml.sample     # Reference configuration
-└── Makefile
-```
+## Configuration
 
----
+<!-- Document configuration options here. This section is yours — the AI will not modify it. -->
 
-## Backend Selection at Build Time
+## CI
 
-In `ilf.toml`:
+<!-- AI:start:ci -->
+_CI documentation pending._
+<!-- AI:end:ci -->
 
-```toml
-[ilf]
-distro   = "arch"
-arch     = "x86_64"
-backend  = "ashos"          # one of: abroot | ashos | frzr | akshara | btrfs-dwarfs
+## Mirror chain
 
-[backend.ashos]
-snapshot_root = "/@"
-deploy_on_boot = true
-
-[backend.abroot]
-registry = "ghcr.io"
-image    = "myorg/myos"
-tag      = "stable"
-```
-
-The `ilf` CLI reads this file and dispatches all operations to the selected backend through the HAL.
-
----
-
-## Adding a New Backend
-
-See [docs/adding-a-backend.md](docs/adding-a-backend.md). The minimum contract is implementing the HAL interface:
+<!-- AI:start:mirror-chain -->
+This repo is maintained in [`Interested-Deving-1896/immutable-linux-framework`](https://github.com/Interested-Deving-1896/immutable-linux-framework) and mirrored through:
 
 ```
-init()       → set up partitions / subvolumes
-upgrade()    → perform an atomic update
-rollback()   → revert to previous state
-snapshot()   → create a named snapshot
-status()     → report current state
-mutable()    → toggle read-write mode
+Interested-Deving-1896/immutable-linux-framework  ──►  OpenOS-Project-OSP/immutable-linux-framework  ──►  OpenOS-Project-Ecosystem-OOC/immutable-linux-framework
 ```
 
----
+Changes flow downstream automatically via the hourly mirror chain in
+[`fork-sync-all`](https://github.com/Interested-Deving-1896/fork-sync-all).
+Direct commits to OSP or OOC are detected and opened as PRs back to `Interested-Deving-1896`.
+<!-- AI:end:mirror-chain -->
+
+## Contributors
+
+<!-- AI:start:contributors -->
+_Contributors pending._
+<!-- AI:end:contributors -->
+
+## Origins
+
+<!-- AI:start:origins -->
+_No dependency graph found. Run `generate-dep-graph.yml` to generate `dep-graph/origins.md`._
+<!-- AI:end:origins -->
+
+## Resources
+
+<!-- AI:start:resources -->
+_No additional resource files found._
+<!-- AI:end:resources -->
 
 ## License
 
-Each integrated backend retains its original license. ILF framework code (core/, tools/, scripts/) is licensed under **GPL-3.0**.
-
-| Component | License |
-|---|---|
-| ABRoot | GPL-3.0 |
-| AshOS | AGPL-3.0 |
-| frzr | MIT |
-| akshara | GPL-3.0 |
-| nearly | GPL-3.0 |
-| btrfs-dwarfs-framework | (see upstream) |
-| ILF core/tools | GPL-3.0 |
+<!-- AI:start:license -->
+<!-- License not detected — add a LICENSE file to this repo. -->
+<!-- AI:end:license -->
