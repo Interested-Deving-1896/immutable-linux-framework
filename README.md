@@ -33,7 +33,18 @@ cd immutable-linux-framework
 ## CI
 
 <!-- AI:start:ci -->
-_CI documentation pending._
+The repository uses GitHub Actions for continuous integration and automation. Below are the workflows and their purposes:
+
+- **build.yml**: Builds the project binaries for all supported architectures. No secrets required.
+- **test.yml**: Runs automated tests using `vitest` for the JavaScript components and `go test` for Go components. No secrets required.
+- **lint.yml**: Lints the codebase using ESLint for JavaScript and `golangci-lint` for Go. No secrets required.
+- **deploy-book.yml**: Deploys the project documentation to the specified hosting service. Requires `DOCS_DEPLOY_TOKEN` secret.
+- **mirror-artifacts.yml**: Synchronizes build artifacts to external storage. Requires `ARTIFACT_STORAGE_KEY` and `ARTIFACT_STORAGE_SECRET` secrets.
+- **sync-to-gitlab.yml**: Mirrors the repository to GitLab. Requires `GITLAB_TOKEN` secret.
+- **cleanup-branches.yml**: Deletes stale branches in the repository. No secrets required.
+- **validate-config.yml**: Validates configuration files such as `go.mod` and `package.json`. No secrets required.
+
+Refer to the `.github/workflows/` directory for detailed workflow configurations.
 <!-- AI:end:ci -->
 
 ## Mirror chain
